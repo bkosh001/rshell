@@ -11,7 +11,7 @@ class And : public Symbols {
         And() : left(0), right(0) {}
         And(Shell* l, Shell* r) : left(l), right(r) {}
         ~And() {}
-        bool execute();
+        int execute();
 };
 
 #endif

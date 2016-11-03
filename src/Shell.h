@@ -6,8 +6,8 @@
 
 class Shell {
     public:
-        // ~Shell() {}
-        virtual bool execute() = 0;
+        ~Shell() {}
+        virtual int execute() = 0;
 };
 
 #endif

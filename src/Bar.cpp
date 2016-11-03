@@ -1,11 +1,14 @@
 #include "Shell.h"
 #include "Bar.h"
 
-bool Bar::execute() {
-    if (!left->execute()) {
+int Bar::execute() {
+    if (left->execute() == 2) {
+        return 2;
+    }
+    if (left->execute() == 1) {
         if (right->execute()) {
-            return true;
+            return 1;
         }
     }
-    return false;
+    return 0;
 }

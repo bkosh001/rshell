@@ -8,7 +8,7 @@ class Symbols : public Shell {
         Shell* left;
         Shell* right;
     public:
-        // virtual bool execute() = 0;
+        virtual int execute() = 0;
 };
 
 #endif

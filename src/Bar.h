@@ -12,7 +12,7 @@ class Bar : public Symbols {
         Bar() : left(0), right(0) {}
         Bar(Shell* l, Shell* r) : left(l), right(0) {}
         ~Bar() {}
-        bool execute();
+        int execute();
 };
 
 #endif

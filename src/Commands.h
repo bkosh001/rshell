@@ -5,12 +5,12 @@
 
 class Commands : public Shell {
     private:
-        char str[500];
+        char str[100];
     public:
         // Commands() : cmd(0) {}
         Commands(char c[]);
         ~Commands() {};
-        bool execute();
+        int execute();
         // char** parses();
 };
 

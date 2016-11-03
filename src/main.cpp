@@ -33,8 +33,6 @@ void getHostLogin(char* host, char* login, size_t l) {
     }
     cout << "l: " << getlogin_r(login, 300) << endl;
     // setlogin_r(login, 300);
-    
-    
 }
 
 // PRINT VECTOR
@@ -57,13 +55,10 @@ void parse(string input, vector<string>& v) {
         // AND SYMBOL
         if (input.at(i) == '&' && input.at(i + 1) == '&'){
             if(i > 0){
-                // cout << "index: " << index << endl;
-                pushCMD = input.substr(index, i - index); //was 1
-                // cout << pushCMD << endl;
+                pushCMD = input.substr(index, i - index);
                 v.push_back(pushCMD);
                 
                 pushSYM = "&&";
-                // cout << pushSYM << endl;
                 v.push_back(pushSYM);
                 
                 i++;
@@ -79,10 +74,7 @@ void parse(string input, vector<string>& v) {
         // OR SYMBOL
         else if (input.at(i) == '|' && input.at(i + 1) == '|'){
             if(i > 0){
-                // cout << "found or" << endl;
-                // cout << "index: " << index << endl;
                 pushCMD = input.substr(index, i - index);
-                // cout << pushCMD << endl;
                 v.push_back(pushCMD);
                 
                 pushSYM = "||";
@@ -90,9 +82,8 @@ void parse(string input, vector<string>& v) {
                 
                 i++;
                 index = i + 1;
-                // cout << "incremented: " << index << endl;
             }
-            else{
+            else {
                 // ASSUMING YOU CANT BEGIN A COMMAND LINE WITH |
                 cout << "Invalid input" << endl;
                 exit(0);
@@ -101,22 +92,17 @@ void parse(string input, vector<string>& v) {
         
         // SEMICOLON SYMBOL
         else if (input.at(i) == ';'){
-            if(i > 0){
-                // cout << "index: " << index << endl;
-                // cout << "found col" << endl;
+            if (i > 0){
                 pushCMD = input.substr(index, i - index);
                 
-                // cout << pushCMD << endl;
                 v.push_back(pushCMD);
                 
                 pushSYM = ";";
                 v.push_back(pushSYM);
                 
-                i++;
                 index = i + 1;
-                // cout << "ind: " << index << endl;
             }
-            else{
+            else {
                 // ASSUMING YOU CANT BEGIN A COMMAND LINE WITH ;
                 cout << "Invalid input" << endl;
                 exit(0);
@@ -133,8 +119,6 @@ void parse(string input, vector<string>& v) {
         pushCMD = input.substr(0, input.length());
         v.push_back(pushCMD);
     }
-    // cout << "Printing vector" << endl;
-    // printVector(v);
 }
 
 // CONVERT INFIX TO POSTFIX AND RETURN POSTFIX VECTOR
@@ -166,7 +150,6 @@ vector<string> InfixtoPostfix(vector<string>& v) {
         postfix.push_back(s.top());
         s.pop();
     }
-    // printVector(postfix);
     return postfix;
 }
 
@@ -174,6 +157,8 @@ vector<string> InfixtoPostfix(vector<string>& v) {
 Shell* buildTree(vector<string> v) {
     stack<Shell*> s;
     for (unsigned int i = 0; i < v.size(); ++i) {
+        
+        // AND SYMBOL
         if (v.at(i).find("&&") != string::npos){
             Shell* right = s.top();
             s.pop();
@@ -182,6 +167,7 @@ Shell* buildTree(vector<string> v) {
             And* SYM = new And(left, right);
             s.push(SYM);
         }
+        // BAR SYMBOL
         else if (v.at(i).find("||") != string::npos){
             Shell* right = s.top();
             s.pop();
@@ -190,6 +176,7 @@ Shell* buildTree(vector<string> v) {
             Bar* SYM = new Bar(left, right);
             s.push(SYM);
         }
+        // SEMICOLON
         else if (v.at(i).find(";") != string::npos){
             Shell* right = s.top();
             s.pop();
@@ -206,7 +193,6 @@ Shell* buildTree(vector<string> v) {
             s.push(t);
         }
     }
-    // printVector(v);
     Shell* top = s.top();
     
     // IF I LEAVE THIS THEN WE GET SEG FAULT
@@ -228,8 +214,9 @@ int main() {
     // getHostLogin(host, login, len);
     // cout << host << endl;
     // cout << login << endl;
-    
-    while(1){
+    // bool go = true;
+    int run = 0;
+    while (run != 2){
         string userInput = "";
         cout << "$ ";
         getline(cin, userInput);
@@ -246,11 +233,13 @@ int main() {
         // cout << "Building tree" << endl;
         Shell* root = buildTree(postfix);
         // cout << "Executing" << endl;
-        bool run = root->execute();
-        if(run || !run){
-            continue;
-        }
         
-    return 0;
+        run = root->execute();
+        if (run == 2) {
+            // cout << run << endl;
+            exit(0);
+        }
     }
+    
+    return 0;
 }

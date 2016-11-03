@@ -5,7 +5,7 @@
 
 class Pound : public Shell {
     public:
-        ~Pound() {};
+        ~Pound() {}
     //inherited string from input
 };
 

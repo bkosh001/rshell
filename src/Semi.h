@@ -12,7 +12,7 @@ class Semi : public Symbols {
         Semi() : left(0), right(0) {}
         Semi(Shell* l, Shell* r) : left(l), right(r) {}
         ~Semi() {}
-        bool execute();
+        int execute();
 };
 
 #endif

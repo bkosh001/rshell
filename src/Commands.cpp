@@ -11,28 +11,28 @@
 using namespace std;
 
 Commands::Commands(char c[]){
-    // printf ("%s\n", c);
     strcpy(this->str, c);
 }
 
-bool Commands::execute() {
+int Commands::execute() {
     char* pch;
     pch = strtok (str," ");
-    vector<char*> vC;
-    while (pch != NULL)
-    {
-        // printf ("%s\n",pch);
-        vC.push_back(pch);
+    char* argv[100] = {};
+    unsigned i = 0;
+    while (pch != NULL) {
+        argv[i] = pch;
         pch = strtok (NULL, " ");
-    }
-    unsigned size = vC.size();
-    char** argv = new char*[size];
-    
-    for(unsigned i = 0; i < vC.size(); i++){
-        argv[i] = vC.at(i);
+        i++;
     }
     
-    // char** argv = &vC[0];
+    // char ** argv = &vC[0];
+    if(strcmp(argv[0], "exit") == 0){
+        // 2 SHOWS THAT WE WANT TO EXIT
+        return 2;
+    }
+    // if(strcmp(argv[0], "#") == 0){ // FIXME
+    //     return 0;
+    // }
     
     pid_t child;
     int status;
@@ -40,55 +40,25 @@ bool Commands::execute() {
     child = fork();
     if (child < 0) {
         // ERROR FORKING CHILD
-        // cout << "what" << endl;
         perror ("Error forking child");
-        return false;
+        return 0;
     }
     else if (child == 0) {
-        // USER ENTERED EXIT COMMAND
-        // cout << "Comparing to exit" << endl;
-        if(strcmp(argv[0], "exit") == 0){
-            exit(0);
-        }
-        // cout << "Executing argv: " << endl;
+        // EXECUTE
         execvp(argv[0], argv);
         
         perror ("Error, execvp shouldn't have gone here");
         // EXECVP SHOULD NOT CONTINUE HERE
-        return false;
+        return 0;
     }
     else if (child > 0) {
-        while(wait(&status) != child);
-        // cout << "Success!!" << endl;
-        return true;
+        while (wait(&status) != child);
+        return 1;
     }
     else {
         // SOMETHING ELSE WENT WRONG
         // cout << "what" << endl;
         perror ("Error, something else went wrong");
-        return false;
+        return 0;
     }
 }
-
-// void Commands::parse(){
-//     char* pch;
-//     pch = strtok (str," ");
-//     vector<char*> vC;
-//     // unsigned i = 0;
-//     while (pch != NULL)
-//     {
-//         printf ("%s\n",pch);
-//         vC.push_back(pch);
-//         // strcpy(argv[i], pch);
-//         // cout << "made it" << endl;
-//         pch = strtok (NULL, " ");
-//         // i++;
-//     }
-//     // cout << "made it" << endl;
-//     char** argv;
-//     argv = new char* [vC.size()];
-//     for(unsigned i = 0; i < vC.size(); i++){
-//         strcpy(argv[i], vC.at(i));
-//     }
-//     return argv;
-// }

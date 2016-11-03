@@ -5,14 +5,17 @@
 
 using namespace std;
 
-bool And::execute() {
+int And::execute() {
     //if left->execute successful, do right->execute
-    if (left->execute()) {
+    if (left->execute() == 2 || right->execute() == 2) {
+        return 2;
+    }
+    if (left->execute() != 2) {
         // cout << "Left success" << endl;
-        if (right->execute()) {
+        if (right->execute() != 2) {
             // cout << "right s" << endl;
-            return true;
+            return 1;
         }
     }
-    return false;
+    return 0;
 }
