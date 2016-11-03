@@ -3,7 +3,7 @@ CC=g++
 CFLAGS=-Wall -Werror -ansi -pedantic#-c not included here because it can't be used to run object files
 
 all: main.o And.o Bar.o Commands.o Semi.o Pound.o
-	#mkdir -p bin/
+	mkdir -p bin/
 	$(CC) main.o And.o Bar.o Commands.o Semi.o Pound.o -o a.out
 
 main.o: main.cpp Commands.h And.h Bar.h Semi.h Shell.h Pound.h
