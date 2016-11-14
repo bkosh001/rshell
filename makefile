@@ -4,11 +4,7 @@ CFLAGS=-Wall -Werror -ansi -pedantic#-c not included here because it can't be us
 
 all: main.o And.o Bar.o Commands.o Semi.o Pound.o
 	mkdir -p bin/
-<<<<<<< HEAD
 	$(CC) main.o And.o Bar.o Commands.o Semi.o Pound.o -o bin/rshell
-=======
-	$(CC) main.o And.o Bar.o Commands.o Semi.o Pound.o -o a.out
->>>>>>> 806f065d6aa2cc50c6495a1762a145d489715f05
 
 main.o: main.cpp Commands.h And.h Bar.h Semi.h Shell.h Pound.h
 	$(CC) main.cpp $(CFLAGS) -c
@@ -29,4 +25,4 @@ Pound.o: Pound.cpp Pound.h Shell.h
 	$(CC) Pound.cpp $(CFLAGS) -c
 
 clean:
-	rm -r bin
+	rm -rf bin
