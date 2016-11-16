@@ -6,16 +6,21 @@
 using namespace std;
 
 int And::execute() {
-    //if left->execute successful, do right->execute
-    if (left->execute() == 2 || right->execute() == 2) {
-        return 2;
-    }
-    if (left->execute() != 2) {
-        // cout << "Left success" << endl;
-        if (right->execute() != 2) {
-            // cout << "right s" << endl;
+    //if lnum->execute successful, do right->execute
+    int lnum = left->execute();
+    if(lnum == 1){
+        int rnum = right->execute();
+        if(rnum == 1){
             return 1;
+        }else if(rnum == 0){
+            return 0;
+        }else if(rnum == 2){
+            return 2;
         }
+    }else if(lnum == 0){
+        return 0;
+    }else if(lnum == 2){
+        return 2;
     }
     return 0;
 }

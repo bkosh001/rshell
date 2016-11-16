@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <vector>
+#include <sys/stat.h>
 using namespace std;
 
 Commands::Commands(char c[]){
@@ -15,24 +16,27 @@ Commands::Commands(char c[]){
 }
 
 int Commands::execute() {
+    // TOKENIZE STRING
     char* pch;
     pch = strtok (str," ");
     char* argv[100] = {};
-    unsigned i = 0;
+    unsigned size = 0;
     while (pch != NULL) {
-        argv[i] = pch;
+        argv[size] = pch;
         pch = strtok (NULL, " ");
-        i++;
+        size++;
     }
-    
-    // char ** argv = &vC[0];
-    if(strcmp(argv[0], "exit") == 0){
+    // CHECK IF EXIT
+    if (strcmp(argv[0], "exit") == 0) {
         // 2 SHOWS THAT WE WANT TO EXIT
         return 2;
     }
-    // if(strcmp(argv[0], "#") == 0){ // FIXME
-    //     return 0;
-    // }
+    // CHECK IF TEST
+    if (strcmp(argv[0], "test") == 0){
+        return test(argv, size);
+    }else if(strcmp(argv[0], "[") == 0){
+        return test(argv, size);
+    }
     
     pid_t child;
     int status;
@@ -47,8 +51,10 @@ int Commands::execute() {
         // EXECUTE
         execvp(argv[0], argv);
         
-        perror ("Error, execvp shouldn't have gone here");
+        perror ("command not found");
         // EXECVP SHOULD NOT CONTINUE HERE
+        // FIX: revise this part, what if a thing needs to happen
+        // i.e easdf || echo x
         return 0;
     }
     else if (child > 0) {
@@ -61,4 +67,162 @@ int Commands::execute() {
         perror ("Error, something else went wrong");
         return 0;
     }
+}
+
+int Commands::test(char* argv[], int size){
+    // ASSUME TEST OR [ IS FIRST CHAR*
+    // IF TEST THEN JUST CHECK NORMALLY
+    // IF [ THEN IGNORE LAST CHAR
+    if (strcmp(argv[0], "test") == 0){
+        if(argv[1]){
+            struct stat sb;
+            // CHECK IF FILE EXISTS
+            if(strcmp(argv[1], "-e") == 0){
+                if(argv[2]){
+                    int num = stat(argv[2], &sb);
+                    if(num == 0){
+                        // SUCCESS: FILE EXISTS
+                        cout << "(True)" << endl;
+                        return 1;
+                    }else{
+                        // FAILED: FILE DOESNT EXIST
+                        cout << "(False)" << endl;
+                        return 0;
+                    }
+                }else{
+                    // FAILED: NO FILE TO CHECK
+                    return 0;
+                }
+            }
+            // CHECK IF IT IS A REGULAR FILE
+            else if(strcmp(argv[1], "-f") == 0){
+                if(argv[2]){
+                    stat(argv[2], &sb);
+                    if (S_ISREG(sb.st_mode)) {
+                        // SUCCESS: IS A REGULAR FILE
+                        cout << "(True)" << endl;
+                        return 1;
+                    }else{
+                        // FAILED: FILE NOT REGULAR
+                        cout << "(False)" << endl;
+                        return 0;
+                    }
+                }else{
+                    // FAILED: NO FILE TO CHECK
+                    cout << "(False)" << endl;
+                    return 0;
+                }
+            }
+            // CHECK IF IT IS A DIRECTORY
+            else if(strcmp(argv[1], "-d") == 0){
+                if(argv[2]){
+                    stat(argv[2], &sb);
+                    if (S_ISDIR(sb.st_mode)) {
+                        // SUCCESS: IS A REGULAR FILE
+                        cout << "(True)" << endl;
+                        return 1;
+                    }else{
+                        // FAILED: FILE NOT REGULAR
+                        cout << "(False)" << endl;
+                        return 0;
+                    }
+                }else{
+                    // FAILED: NO FILE TO CHECK
+                    cout << "(False)" << endl;
+                    return 0;
+                }
+            }
+            // ASSUME -e
+            else{
+                if(stat(argv[1], &sb) == 0){
+                    // SUCCESS: FILE EXISTS
+                    cout << "(True)" << endl;
+                    return 1;
+                }else{
+                    // FAILED: FILE DOESNT EXIST
+                    cout << "(False)" << endl;
+                    return 0;
+                }
+            }
+        }
+    }else if(strcmp(argv[0], "[") == 0){
+        if(strcmp(argv[size - 1], "]") == 0){
+            if(argv[1]){
+                struct stat sb;
+                // CHECK IF FILE EXISTS
+                if(strcmp(argv[1], "-e") == 0){
+                    if(argv[2]){
+                        int num = stat(argv[2], &sb);
+                        if(num == 0){
+                            // SUCCESS: FILE EXISTS
+                            cout << "(True)" << endl;
+                            return 1;
+                        }else{
+                            // FAILED: FILE DOESNT EXIST
+                            cout << "(False)" << endl;
+                            return 0;
+                        }
+                    }else{
+                        // FAILED: NO FILE TO CHECK
+                        return 0;
+                    }
+                }
+                // CHECK IF IT IS A REGULAR FILE
+                else if(strcmp(argv[1], "-f") == 0){
+                    if(argv[2]){
+                        stat(argv[2], &sb);
+                        if (S_ISREG(sb.st_mode)) {
+                            // SUCCESS: IS A REGULAR FILE
+                            cout << "(True)" << endl;
+                            return 1;
+                        }else{
+                            // FAILED: FILE NOT REGULAR
+                            cout << "(False)" << endl;
+                            return 0;
+                        }
+                    }else{
+                        // FAILED: NO FILE TO CHECK
+                        cout << "(False)" << endl;
+                        return 0;
+                    }
+                }
+                // CHECK IF IT IS A DIRECTORY
+                else if(strcmp(argv[1], "-d") == 0){
+                    if(argv[2]){
+                        stat(argv[2], &sb);
+                        if (S_ISDIR(sb.st_mode)) {
+                            // SUCCESS: IS A REGULAR FILE
+                            cout << "(True)" << endl;
+                            return 1;
+                        }else{
+                            // FAILED: FILE NOT REGULAR
+                            cout << "(False)" << endl;
+                            return 0;
+                        }
+                    }else{
+                        // FAILED: NO FILE TO CHECK
+                        cout << "(False)" << endl;
+                        return 0;
+                    }
+                }
+                // ASSUME -e
+                else{
+                    if(stat(argv[1], &sb) == 0){
+                        // SUCCESS: FILE EXISTS
+                        cout << "(True)" << endl;
+                        return 1;
+                    }else{
+                        // FAILED: FILE DOESNT EXIST
+                        cout << "(False)" << endl;
+                        return 0;
+                    }
+                }
+            }else{
+                // NO FILE TO CHECK
+                return 0;
+            }
+        }
+    }
+    cout << "(False)" << endl;
+    return 0;
 }

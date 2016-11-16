@@ -12,6 +12,7 @@ class Commands : public Shell {
         ~Commands() {};
         int execute();
         // char** parses();
+        int test(char* argv[], int size);
 };
 
 #endif

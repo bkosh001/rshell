@@ -5,6 +5,7 @@
 #include "Symbols.h"
 
 class Semi : public Symbols {
+    // do right->execute() and left->execute()
     private:
         Shell* left;
         Shell* right;

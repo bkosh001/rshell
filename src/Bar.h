@@ -5,6 +5,7 @@
 #include "Symbols.h"
 
 class Bar : public Symbols {
+    //if left->execute() successful, do right->execute()
     private:
         Shell* left;
         Shell* right;

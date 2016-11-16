@@ -2,18 +2,14 @@
 #include "Semi.h"
 
 int Semi::execute() {
-    // if (left->execute() == 0 || right->execute() ) {
-    //     return 2;
-    // }
-    // if (!left->execute() || !right->execute()) {
-    //     return 1;
-    // }
-    // return 0;
+    // execute both no matter what
+    int lnum = left->execute();
+    int rnum = right->execute();
     
-    if (left->execute() == 0 || right->execute() == 0) {
+    if(lnum == 0 || rnum == 0){
         return 0;
+    }else if(lnum == 2 || rnum == 2){
+        return 2;
     }
-    else {
-        return 1;
-    }
+    return 1;
 }
