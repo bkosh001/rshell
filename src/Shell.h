@@ -6,7 +6,7 @@
 
 class Shell {
     public:
-        ~Shell() {}
+        virtual ~Shell() {}
         virtual int execute() = 0;
 };
 

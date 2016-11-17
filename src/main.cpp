@@ -19,35 +19,37 @@
 using namespace std;
 void getHostLogin(char*, char*, size_t);
 void sharp(string&);
-void printVector(vector<string> v);
+void printVector(const vector<string>& v);
 vector<string> InfixtoPostfix(vector<string>& v);
 void parse(string input, vector<string>& v);
-Shell* buildTree(vector<string> v);
+Shell* buildTree(vector<string> v, stack<Shell*> s);
 
 void getHostLogin(char* host, char* login, size_t l) {
-    // sethostname(gethostname(host, 300), 300);
-    // cout << "g: " << gethostname(host,l) << endl;
+    // sethostname(gethostname(host, 300), 300)
     if (!gethostname(host,l)) {
         //Successfully retrieved hostname
         sethostname(host,l);
-        
     }
-    // cout << "l: " << getlogin_r(login, 300) << endl;
-    // setlogin_r(login, 300);
+    if (!getlogin_r(login, l)) {
+        // setlogin(login);
+    }
 }
 
+
 // PRINT VECTOR
-void printVector(vector<string> v) {
+void printVector(const vector<string>& v) {
     for (unsigned i = 0; i < v.size(); i++) {
         cout << i << ":" << v.at(i) << endl;
     }
 }
 
 void sharp(string& input) {
-    unsigned int s = input.find('#');
-    if (s > input.size()) {
+    if (input.find('#') == string::npos) {
+        //no sharp found in input
         return;
     }
+    
+    /*
     // unsigned int i = 0;
     // unsigned int j = 0;
     
@@ -74,13 +76,12 @@ void sharp(string& input) {
     // cout << j << endl;
     // cout << s << endl;
     // cout << string::npos << endl;
-    // return;
+    // return; */
     
     
     // if comment, cuts off everything after comment
     for (unsigned int i = 0; i < input.size(); ++i) {
         if (input.at(i) == '#') {
-            
             if (input.at(i - 1) == ' ') {
                 //FIX: check if '#' in quotes
                 //FIX: check if 
@@ -94,7 +95,6 @@ void sharp(string& input) {
             }
         }
     }
-    // cout << index << endl;
 }
 
 // PARSE STRING INTO CHAR POINTERS
@@ -105,20 +105,19 @@ void parse(string input, vector<string>& v) {
     // searches strings
     string pushCMD = "";
     string pushSYM = "";
+    string pushT1  = "";
+    string pushT2  = "";
     
     unsigned index = 0;
     
     for (unsigned int i = 0; i < input.length() - 1; ++i) {
-        if (input.at(i) == '(' && input.find(')') != string::npos) {
-            int p1 = input.find(')');
-            if (input.at(i - 1) == '\\' || input.at(p1 - 1) == '\\') {
-                continue;
-                //user does not want precedence
-            }
-            
-            
-            //found a set of parenthesis
+        if (input.at(i) == '(') {
+            pushT1 = '(';
+            v.push_back(pushT1);
+            i++;
+            index++;
         }
+            //found a set of parenthesis
         // AND SYMBOL
         if (input.at(i) == '&' && input.at(i + 1) == '&') {
             if (i > 0) {
@@ -188,7 +187,7 @@ void parse(string input, vector<string>& v) {
             }
             else {
                 // ASSUMING YOU CANT BEGIN A COMMAND LINE WITH ;
-                cout << "Invalid input" << endl;
+                cout << "bash: syntax error near unexpected token `;'" << endl;
                 exit(0);
             }
         }
@@ -196,7 +195,7 @@ void parse(string input, vector<string>& v) {
     
     // PUSH REMAINING COMMAND
     if (index != 0) {
-        pushCMD = input.substr(index + 1, input.length() - 1);
+        pushCMD = input.substr(index, input.length() - 1);
         v.push_back(pushCMD);
     }
     else { // if (index == 0) { 
@@ -204,7 +203,7 @@ void parse(string input, vector<string>& v) {
         v.push_back(pushCMD);
     }
     
-    // printVector(v);
+    printVector(v);
     return;
     
 }
@@ -240,8 +239,7 @@ vector<string> InfixtoPostfix(vector<string>& v) {
 }
 
 // BUILD SHELL TREE AND RETURN ROOT
-Shell* buildTree(vector<string> v) {
-    stack<Shell*> s;
+Shell* buildTree(vector<string> v, stack<Shell*> s) {
     for (unsigned int i = 0; i < v.size(); ++i) {
         
         // AND SYMBOL
@@ -302,36 +300,44 @@ Shell* buildTree(vector<string> v) {
 
 
 int main() {
-    // char host [500];
-    // char login [500];
-    // getHostLogin(host, login, 500);
-    // cout << host << endl;
+    char host [500];
+    char login [500];
+    getHostLogin(host, login, 500);
+    // cout << login << '@' << host;
     // cout << login << endl;
     // bool go = true;
     int run = 0;
     while (run != 2){
         string userInput = "";
-        cout << "$ ";
+        cout << login << '@' << host << "$ ";
         getline(cin, userInput);
-        
-        if(userInput.size() != 0){
+        // cout << "fuck" << endl;
+        if (userInput.size() != 0 && userInput.at(0) != '#') {
             // cout << "Creating vector" << endl;
             vector<string> userStrings;
+            stack<Shell*> s;
             // cout << "Parsing userinput" << endl;
             parse(userInput, userStrings);
             // cout << "Converting to postfix" << endl;
             vector<string> postfix = InfixtoPostfix(userStrings);
             // cout << "Building tree" << endl;
-            Shell* root = buildTree(postfix);
+            Shell* root = buildTree(postfix, s);
             // cout << "Executing" << endl;
             
             run = root->execute();
+            Shell* t = 0;
+            while (!s.empty()) {
+                t = s.top();
+                s.pop();
+                delete t;
+                t = 0;
+            }
+            
             if (run == 2) {
                 // cout << run << endl;
                 exit(0);
             }
         }
     }
-    
     return 0;
 }
