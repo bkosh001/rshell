@@ -311,7 +311,7 @@ int main() {
         string userInput = "";
         cout << login << '@' << host << "$ ";
         getline(cin, userInput);
-        // cout << "fuck" << endl;
+        // cout << "fuck" << endl;/
         if (userInput.size() != 0 && userInput.at(0) != '#') {
             // cout << "Creating vector" << endl;
             vector<string> userStrings;
