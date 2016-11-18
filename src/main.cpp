@@ -35,49 +35,18 @@ void getHostLogin(char* host, char* login, size_t l) {
     }
 }
 
-
 // PRINT VECTOR
-void printVector(const vector<string>& v) {
-    for (unsigned i = 0; i < v.size(); i++) {
-        cout << i << ":" << v.at(i) << endl;
-    }
-}
+// void printVector(const vector<string>& v) {
+//     for (unsigned i = 0; i < v.size(); i++) {
+//         cout << i << ":" << v.at(i) << endl;
+//     }
+// }
 
 void sharp(string& input) {
     if (input.find('#') == string::npos) {
         //no sharp found in input
         return;
     }
-    
-    /*
-    // unsigned int i = 0;
-    // unsigned int j = 0;
-    
-    // for (i = 0; i < input.size(); ++i) {
-    //     if (input.at(i) == '"') {
-    //         if (i < s) {
-    //             // if element(") < element('#') 
-    //             for (j = i + 1; j < input.size(); ++j) {
-    //                 if (input.at(j) == '"') {
-    //                     if (j > s) {
-    //                         // if 2nd element('"') > element('#')
-    //                         //not a comment, check for another comment after the quote
-    //                         break;
-    //                     }
-    //                     else {
-                            
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-    // cout << i << endl;
-    // cout << j << endl;
-    // cout << s << endl;
-    // cout << string::npos << endl;
-    // return; */
-    
     
     // if comment, cuts off everything after comment
     for (unsigned int i = 0; i < input.size(); ++i) {
@@ -91,7 +60,10 @@ void sharp(string& input) {
                 //FIX: what if echo 1234\  #1234 --> 1234
                 //FIX: what if echo 1234 \#1234 --> 1234 #1234
                 //FIX: what if echo 1234 ##1234 --> 1234
-                input = input.substr(0,i);
+                input = input.substr(0, i - 1);
+                while (input.at(input.size() - 1) == ' ') {
+                    input.erase(input.size() - 1, 1);
+                }
             }
         }
     }
@@ -105,30 +77,51 @@ void parse(string input, vector<string>& v) {
     // searches strings
     string pushCMD = "";
     string pushSYM = "";
-    string pushT1  = "";
-    string pushT2  = "";
     
     unsigned index = 0;
-    
     for (unsigned int i = 0; i < input.length() - 1; ++i) {
         if (input.at(i) == '(') {
-            pushT1 = '(';
-            v.push_back(pushT1);
-            i++;
-            index++;
+            pushSYM = "(";
+            v.push_back(pushSYM);
+            index = i + 1;
         }
-            //found a set of parenthesis
-        // AND SYMBOL
-        if (input.at(i) == '&' && input.at(i + 1) == '&') {
-            if (i > 0) {
-                pushCMD = input.substr(index, i - index);
+        else if (input.at(i) == ')') {
+            pushCMD = input.substr(index, i - index);
+            // FIX ME
+            // GET RID OF WHITESPACE
+            if (pushCMD.length() != 1 && pushCMD != " " && pushCMD != "") {
                 while (pushCMD.at(0) == ' ') {
                     pushCMD.erase(0,1);
                 }
                 while (pushCMD.at(pushCMD.size() - 1) == ' ') {
                     pushCMD.erase(pushCMD.size() - 1, 1);
                 }
+            }
+            if (pushCMD != " " && pushCMD != ""){
                 v.push_back(pushCMD);
+            }
+            
+            pushSYM = ")";
+            v.push_back(pushSYM);
+            
+            index = i + 1;
+        }
+            //found a set of parenthesis
+        // AND SYMBOL
+        else if (input.at(i) == '&' && input.at(i + 1) == '&') {
+            if (i > 0) {
+                pushCMD = input.substr(index, i - index);
+                if(pushCMD.length() != 1 && pushCMD != " "){
+                    while (pushCMD.at(0) == ' ') {
+                        pushCMD.erase(0,1);
+                    }
+                    while (pushCMD.at(pushCMD.size() - 1) == ' ') {
+                        pushCMD.erase(pushCMD.size() - 1, 1);
+                    }
+                }
+                if(pushCMD != " " && pushCMD != "\0"){
+                    v.push_back(pushCMD);
+                }
                 
                 pushSYM = "&&";
                 v.push_back(pushSYM);
@@ -138,7 +131,7 @@ void parse(string input, vector<string>& v) {
             }
             else {
                 // ASSUMING YOU CANT BEGIN A COMMAND LINE WITH &
-                cout << "Invalid input" << endl;
+               cout << "bash: syntax error near unexpected token '" << input.at(0) << "'"<< endl;
                 exit(0);
             }
         }
@@ -147,14 +140,18 @@ void parse(string input, vector<string>& v) {
         else if (input.at(i) == '|' && input.at(i + 1) == '|') {
             if (i > 0) {
                 pushCMD = input.substr(index, i - index);
-                while (pushCMD.at(0) == ' ') {
-                    pushCMD.erase(0,1);
+                if (pushCMD.length() != 1 && pushCMD != " ") {
+                    while (pushCMD.at(0) == ' ') {
+                        pushCMD.erase(0,1);
+                    }
+                    while (pushCMD.at(pushCMD.size() - 1) == ' ') {
+                        pushCMD.erase(pushCMD.size() - 1, 1);
+                    }
                 }
-                while (pushCMD.at(pushCMD.size() - 1) == ' ') {
-                    pushCMD.erase(pushCMD.size() - 1, 1);
+                if (pushCMD != " " && pushCMD != "\0"){
+                    v.push_back(pushCMD);
                 }
-                v.push_back(pushCMD);
-                
+                    
                 pushSYM = "||";
                 v.push_back(pushSYM);
                 
@@ -163,7 +160,7 @@ void parse(string input, vector<string>& v) {
             }
             else {
                 // ASSUMING YOU CANT BEGIN A COMMAND LINE WITH |
-                cout << "Invalid input" << endl;
+                cout << "bash: syntax error near unexpected token '" << input.at(0) << "'"<< endl;
                 exit(0);
             }
         }
@@ -178,7 +175,9 @@ void parse(string input, vector<string>& v) {
                 while (pushCMD.at(pushCMD.size() - 1) == ' ') {
                     pushCMD.erase(pushCMD.size() - 1, 1);
                 }
-                v.push_back(pushCMD);
+                if(pushCMD != " " && pushCMD != ""){
+                    v.push_back(pushCMD);
+                }
                 
                 pushSYM = ";";
                 v.push_back(pushSYM);
@@ -187,7 +186,7 @@ void parse(string input, vector<string>& v) {
             }
             else {
                 // ASSUMING YOU CANT BEGIN A COMMAND LINE WITH ;
-                cout << "bash: syntax error near unexpected token `;'" << endl;
+                cout << "bash: syntax error near unexpected token '" << input.at(0) << "'"<< endl;
                 exit(0);
             }
         }
@@ -196,16 +195,37 @@ void parse(string input, vector<string>& v) {
     // PUSH REMAINING COMMAND
     if (index != 0) {
         pushCMD = input.substr(index, input.length() - 1);
-        v.push_back(pushCMD);
+        if (pushCMD.length() == 1){
+            if (pushCMD == ")"){
+                v.push_back(")");
+            }
+        }
+        else {
+            while (pushCMD.at(0) == ' ') {
+                pushCMD.erase(0,1);
+            }
+            while (pushCMD.at(pushCMD.size() - 1) == ' ') {
+                pushCMD.erase(pushCMD.size() - 1, 1);
+            }
+            if (pushCMD.at(pushCMD.length() - 1) == ')' ) {
+                pushCMD.erase(pushCMD.length() - 1, 1);
+                if(pushCMD != "" || pushCMD != " "){
+                    v.push_back(pushCMD);
+                }
+                v.push_back(")");
+            }
+            else {
+                v.push_back(pushCMD);
+            }
+        }
+        
     }
     else { // if (index == 0) { 
         pushCMD = input.substr(0, input.length());
         v.push_back(pushCMD);
     }
     
-    printVector(v);
-    return;
-    
+    // printVector(v);
 }
 
 // CONVERT INFIX TO POSTFIX AND RETURN POSTFIX VECTOR
@@ -213,28 +233,47 @@ vector<string> InfixtoPostfix(vector<string>& v) {
     // printVector(v);
     stack<string> s;
     vector<string> postfix;
-    
+
     for (unsigned i = 0; i < v.size(); i++) {
-        
         // IF CONNECTOR THEN PUSH STACK TO POSTFIX AND POP THEN PUSH CONNECTOR
         // FIXME
+
         if (v.at(i) == "&&" ||  v.at(i) == "||" || v.at(i) == ";") {
-            while (!s.empty()) {
-                postfix.push_back(s.top());
+            if(!s.empty()){
+                if(s.top() != "("){
+                    postfix.push_back(s.top());
+                }
                 s.pop();
             }
             s.push(v.at(i));
+        }
+        // IF LEFT PARENTHESES, PUSH
+        
+        else if (v.at(i) == "(") {
+            s.push(v.at(i));
+        }
+        else if (v.at(i) == ")") {
+            while (!s.empty() && s.top() != "("){
+                postfix.push_back(s.top()); 
+                s.pop();
+            }
+            
+            if(!s.empty()){
+                if(s.top() == "("){
+                    s.pop();
+                }
+            }
         }
         // ELSE THEN COMMAND SO ADD TO POSTFIX
         else if (i < v.size()) {
             postfix.push_back(v.at(i)); //"FIX"
         }
-    }
-    
+    }    
     while (!s.empty()){
         postfix.push_back(s.top());
         s.pop();
     }
+    // printVector(postfix);
     return postfix;
 }
 
@@ -269,13 +308,6 @@ Shell* buildTree(vector<string> v, stack<Shell*> s) {
             s.pop();
             Semi* SYM = new Semi(left, right);
             s.push(SYM);
-            // if (right == 0) {
-            //     cout << "r" << endl;
-            // }
-            // if (left == 0) {
-            //     cout << "l" << endl;
-            // }
-            // FIX: segfault with ||, no segfault when first command is wrong
         }
         else { //item is not a connector
             char* str = new char[v.at(i).length() - 1];
@@ -287,14 +319,6 @@ Shell* buildTree(vector<string> v, stack<Shell*> s) {
     }
     Shell* top = s.top();
     
-    // IF I LEAVE THIS THEN WE GET SEG FAULT
-    // delete stack
-    // while (!s.empty()) {
-    //     Shell* t = s.top();
-    //     s.pop();
-    //     delete t;
-    //     t = 0;
-    // }
     return top;
 }
 
@@ -303,15 +327,12 @@ int main() {
     char host [500];
     char login [500];
     getHostLogin(host, login, 500);
-    // cout << login << '@' << host;
-    // cout << login << endl;
     // bool go = true;
     int run = 0;
-    while (run != 2){
+    while (run != 2) {
         string userInput = "";
         cout << login << '@' << host << "$ ";
         getline(cin, userInput);
-        // cout << "fuck" << endl;/
         if (userInput.size() != 0 && userInput.at(0) != '#') {
             // cout << "Creating vector" << endl;
             vector<string> userStrings;
@@ -332,7 +353,9 @@ int main() {
                 delete t;
                 t = 0;
             }
-            
+            //issue where multiple invalid inputs
+            //try to exit, must enter "exit" multiple times
+            //before it does anything
             if (run == 2) {
                 // cout << run << endl;
                 exit(0);
