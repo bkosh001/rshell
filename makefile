@@ -4,7 +4,11 @@ CFLAGS=-Wall -Werror -ansi -pedantic#-c not included here because it can't be us
 
 all: main.o And.o Bar.o Commands.o Semi.o Pound.o
 	mkdir -p bin/
-	$(CC) $(CFLAGS) main.o And.o Bar.o Commands.o Semi.o Pound.o -o ./bin/rshell
+ 	(CC) $(CFLAGS) main.o And.o Bar.o Commands.o Semi.o -o ./bin/rshell
+
+rshell: main.o And.o Bar.o Commands.o Semi.o Pound.o
+	mkdir -p bin/
+ 	(CC) $(CFLAGS) main.o And.o Bar.o Commands.o Semi.o -o ./bin/rshell
 
 main.o:
 	$(CC) ./src/main.cpp $(CFLAGS) -c
@@ -20,9 +24,6 @@ Commands.o:
 
 Semi.o:
 	$(CC) ./src/Semi.cpp $(CFLAGS) -c
-
-Pound.o:
-	$(CC) ./src/Pound.cpp $(CFLAGS) -c
 
 clean:
 	rm -r bin
