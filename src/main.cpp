@@ -2,7 +2,6 @@
 #include "And.h"
 #include "Bar.h"
 #include "Commands.h"
-// #include "Pound.h"
 #include "Semi.h"
 #include <iostream>
 #include <string>
@@ -36,11 +35,11 @@ void getHostLogin(char* host, char* login, size_t l) {
 }
 
 // PRINT VECTOR
-// void printVector(const vector<string>& v) {
-//     for (unsigned i = 0; i < v.size(); i++) {
-//         cout << i << ":" << v.at(i) << endl;
-//     }
-// }
+void printVector(const vector<string>& v) {
+    for (unsigned i = 0; i < v.size(); i++) {
+        cout << i << ":" << v.at(i) << endl;
+    }
+}
 
 void sharp(string& input) {
     if (input.find('#') == string::npos) {
@@ -52,14 +51,6 @@ void sharp(string& input) {
     for (unsigned int i = 0; i < input.size(); ++i) {
         if (input.at(i) == '#') {
             if (input.at(i - 1) == ' ') {
-                //FIX: check if '#' in quotes
-                //FIX: check if 
-                // if the input has a valid comment
-                //FIX: what if echo "1243 #1234" --> 1234 #1234
-                //FIX: what if echo 1234\ #1324 --> 1234 #1234
-                //FIX: what if echo 1234\  #1234 --> 1234
-                //FIX: what if echo 1234 \#1234 --> 1234 #1234
-                //FIX: what if echo 1234 ##1234 --> 1234
                 input = input.substr(0, i - 1);
                 while (input.at(input.size() - 1) == ' ') {
                     input.erase(input.size() - 1, 1);
@@ -138,9 +129,10 @@ void parse(string input, vector<string>& v) {
         
         // OR SYMBOL
         else if (input.at(i) == '|' && input.at(i + 1) == '|') {
+            
             if (i > 0) {
                 pushCMD = input.substr(index, i - index);
-                if (pushCMD.length() != 1 && pushCMD != " ") {
+                if (pushCMD.length() > 1 && pushCMD != " ") {
                     while (pushCMD.at(0) == ' ') {
                         pushCMD.erase(0,1);
                     }
@@ -148,10 +140,11 @@ void parse(string input, vector<string>& v) {
                         pushCMD.erase(pushCMD.size() - 1, 1);
                     }
                 }
+                
                 if (pushCMD != " " && pushCMD != "\0"){
                     v.push_back(pushCMD);
                 }
-                    
+                
                 pushSYM = "||";
                 v.push_back(pushSYM);
                 
@@ -191,7 +184,6 @@ void parse(string input, vector<string>& v) {
             }
         }
     }
-    
     // PUSH REMAINING COMMAND
     if (index != 0) {
         pushCMD = input.substr(index, input.length() - 1);
@@ -258,8 +250,8 @@ vector<string> InfixtoPostfix(vector<string>& v) {
                 s.pop();
             }
             
-            if(!s.empty()){
-                if(s.top() == "("){
+            if (!s.empty()){
+                if (s.top() == "(") {
                     s.pop();
                 }
             }
@@ -321,7 +313,6 @@ Shell* buildTree(vector<string> v, stack<Shell*> s) {
     
     return top;
 }
-
 
 int main() {
     char host [500];

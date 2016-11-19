@@ -1,10 +1,11 @@
 #include "Shell.h"
 #include "Bar.h"
-
+#include <iostream>
+using namespace std;
 int Bar::execute() {
     //if lnum->execute() was unsuccessful, do rnum->execute()
     int lnum = left->execute();
-    if(lnum == 0) {
+    if (lnum == 0) {
         int rnum = right->execute();
         if (rnum == 1) {
             return 1;

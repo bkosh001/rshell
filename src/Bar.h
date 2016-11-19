@@ -11,7 +11,7 @@ class Bar : public Symbols {
         Shell* right;
     public:
         Bar() : left(0), right(0) {}
-        Bar(Shell* l, Shell* r) : left(l), right(0) {}
+        Bar(Shell* l, Shell* r) : left(l), right(r) {}
         ~Bar() {}
         int execute();
 };

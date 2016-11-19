@@ -37,10 +37,9 @@ int Commands::execute() {
     }else if(strcmp(argv[0], "[") == 0){
         return test(argv, size);
     }
-    
+    int returnval = -1;
     pid_t child;
     int status;
-    
     child = fork();
     if (child < 0) {
         // ERROR FORKING CHILD
@@ -55,18 +54,18 @@ int Commands::execute() {
         // EXECVP SHOULD NOT CONTINUE HERE
         // FIX: revise this part, what if a thing needs to happen
         // i.e easdf || echo x
-        return 0;
+        returnval = 0;
     }
     else if (child > 0) {
         while (wait(&status) != child);
+        if(returnval == 0){
+            return 0;
+        }
         return 1;
     }
-    else {
-        // SOMETHING ELSE WENT WRONG
-        // cout << "what" << endl;
-        perror ("Error, something else went wrong");
-        return 0;
-    }
+     
+    // SOMETHING ELSE WENT WRONG
+    return 0;
 }
 
 int Commands::test(char* argv[], int size){
