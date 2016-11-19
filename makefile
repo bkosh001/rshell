@@ -1,6 +1,6 @@
 CC=g++
 
-CFLAGS=-Wall -Werror -ansi -pedantic#-c not included here because it can't be used to run object files
+CFLAGS=-Wall -Werror -ansi -pedantic#-c not included here because it can't be used to run object files, a
 
 all: main.o And.o Bar.o Commands.o Semi.o
 	mkdir -p bin/
@@ -11,19 +11,19 @@ rshell: main.o And.o Bar.o Commands.o Semi.o
 	$(CC) main.o And.o Bar.o Commands.o Semi.o -o bin/rshell
 
 main.o: main.cpp Commands.h And.h Bar.h Semi.h Shell.h
-	$(CC) main.cpp $(CFLAGS) -c
+	$(CC) ./src/main.cpp $(CFLAGS) -c
 
 And.o: And.cpp And.h Symbols.h Shell.h
-	$(CC) And.cpp $(CFLAGS) -c
+	$(CC) ./src/And.cpp $(CFLAGS) -c
 
 Bar.o: Bar.cpp Bar.h Symbols.h Shell.h
-	$(CC) Bar.cpp $(CFLAGS) -c
+	$(CC) ./src/Bar.cpp $(CFLAGS) -c
     
 Commands.o: Commands.cpp Commands.h Shell.h
-	$(CC) Commands.cpp $(CFLAGS) -c
+	$(CC) ./src/Commands.cpp $(CFLAGS) -c
 	
 Semi.o: Semi.cpp Semi.h Symbols.h Shell.h
-	$(CC) Semi.cpp $(CFLAGS) -c
+	$(CC) ./src/Semi.cpp $(CFLAGS) -c
 
 clean:
 	rm -rf bin
