@@ -2,13 +2,13 @@ CC=g++
 
 CFLAGS=-Wall -Werror -ansi -pedantic#-c not included here because it can't be used to run object files
 
-all: main.o And.o Bar.o Commands.o Semi.o Pound.o
+all: main.o And.o Bar.o Commands.o Semi.o
 	mkdir -p bin/
- 	(CC) $(CFLAGS) main.o And.o Bar.o Commands.o Semi.o -o ./bin/rshell
+ 	$(CC) $(CFLAGS) main.o And.o Bar.o Commands.o Semi.o -o ./bin/rshell
 
-rshell: main.o And.o Bar.o Commands.o Semi.o Pound.o
+rshell: main.o And.o Bar.o Commands.o Semi.o
 	mkdir -p bin/
- 	(CC) $(CFLAGS) main.o And.o Bar.o Commands.o Semi.o -o ./bin/rshell
+ 	$(CC) $(CFLAGS) main.o And.o Bar.o Commands.o Semi.o -o ./bin/rshell
 
 main.o:
 	$(CC) ./src/main.cpp $(CFLAGS) -c
