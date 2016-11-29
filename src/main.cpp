@@ -70,7 +70,7 @@ void parse(string input, vector<string>& v) {
     string pushSYM = "";
     
     unsigned index = 0;
-    for (unsigned int i = 0; i < input.length() - 1; ++i) {
+    for (unsigned int i = 0; i < input.length(); ++i) {
         if (input.at(i) == '(') {
             pushSYM = "(";
             v.push_back(pushSYM);
@@ -160,7 +160,7 @@ void parse(string input, vector<string>& v) {
         
         // SEMICOLON SYMBOL
         else if (input.at(i) == ';') {
-            if (i > 0){
+            if (i > 0) {
                 pushCMD = input.substr(index, i - index);
                 while (pushCMD.at(0) == ' ') {
                     pushCMD.erase(0,1);
@@ -168,7 +168,8 @@ void parse(string input, vector<string>& v) {
                 while (pushCMD.at(pushCMD.size() - 1) == ' ') {
                     pushCMD.erase(pushCMD.size() - 1, 1);
                 }
-                if(pushCMD != " " && pushCMD != ""){
+
+                if (pushCMD != " " && pushCMD != ""){
                     v.push_back(pushCMD);
                 }
                 
@@ -303,7 +304,7 @@ Shell* buildTree(vector<string> v, stack<Shell*> s) {
         }
         else { //item is not a connector
             char* str = new char[v.at(i).length() - 1];
-            strcpy(str, v.at(i).c_str());
+            strcpy(str, v.at(i).c_str()); //error here in valgrind
             // printf ("%s\n",str);
             Commands* t = new Commands(str);
             s.push(t);
@@ -314,10 +315,12 @@ Shell* buildTree(vector<string> v, stack<Shell*> s) {
     return top;
 }
 
+
 int main() {
-    char host [500];
-    char login [500];
+    char host [500] = "";
+    char login [500] = "";
     getHostLogin(host, login, 500);
+    
     // bool go = true;
     int run = 0;
     while (run != 2) {

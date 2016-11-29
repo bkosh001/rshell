@@ -34,8 +34,13 @@ int Commands::execute() {
     // CHECK IF TEST
     if (strcmp(argv[0], "test") == 0){
         return test(argv, size);
-    }else if(strcmp(argv[0], "[") == 0){
+    }
+    else if (strcmp(argv[0], "[") == 0) {
         return test(argv, size);
+    }
+    // CHECK IF CD
+    else if (strcmp(argv[0], "cd") == 0) {
+        return cd(argv, size);
     }
     int returnval = -1;
     pid_t child;
@@ -49,8 +54,11 @@ int Commands::execute() {
     else if (child == 0) {
         // EXECUTE
         execvp(argv[0], argv);
-        
-        perror ("command not found");
+        // char t[] = "bash: ";
+        // char v[] = ": command not found";
+        // strcat(t,argv);
+        // strcat(t,v); FIX: include incorrect command in perror()
+        perror ("bash: command not found");
         // EXECVP SHOULD NOT CONTINUE HERE
         // FIX: revise this part, what if a thing needs to happen
         // i.e easdf || echo x
@@ -239,4 +247,37 @@ int Commands::test(char* argv[], int size){
     }
     cout << "(False)" << endl;
     return 0;
+}
+
+int Commands::cd(char* argv[], int size){
+    int ret = 0;
+    char pwd[500] = "";
+    // CD TO <PATH> OR -
+
+    if (argv[1]){
+        // CD TO PREVIOUS WORKING DIR
+        if (strcmp(argv[1], "-") == 0) {
+            chdir(argv[1]); //fix needed, this doesn't work
+            getenv(argv[1]);
+            setenv(argv[1], pwd, 1);
+            
+            return 1;
+        }
+        // CD TO HOME DIRECTORY
+        
+        // CD TO PATH
+        chdir(argv[1]);
+        getenv(argv[1]);
+        setenv(argv[1], pwd, 1);
+        // perror("bash: cd: no such file or directory");
+cout << "heaven" << endl;
+        return 1;
+    }
+    // JUST CD
+    chdir(getenv("HOME"));
+    getenv("HOME");
+    setenv("HOME", pwd, 1); //what omar did
+    //cd to home directory
+    cout << "hell" << endl;
+    return ret;
 }
