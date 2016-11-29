@@ -13,6 +13,7 @@ class Commands : public Shell {
         int execute();
         // char** parses();
         int test(char* argv[], int size);
+        int cd(char*argv[], int size);
 };
 
 #endif
