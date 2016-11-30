@@ -252,6 +252,7 @@ int Commands::test(char* argv[], int size){
 int Commands::cd(char* argv[], int size){
     int ret = 0;
     char pwd[500] = "";
+    char err[500] = "bash: cd: ";
     // CD TO <PATH> OR -
 
     if (argv[1]){
@@ -269,15 +270,17 @@ int Commands::cd(char* argv[], int size){
         chdir(argv[1]);
         getenv(argv[1]);
         setenv(argv[1], pwd, 1);
-        // perror("bash: cd: no such file or directory");
-cout << "heaven" << endl;
+        strcat(err,argv[1]);
+        perror(err);
         return 1;
     }
     // JUST CD
-    chdir(getenv("HOME"));
-    getenv("HOME");
-    setenv("HOME", pwd, 1); //what omar did
+    char* h = getenv("HOME");
+    chdir(h);
+    getenv(h);
+    setenv(h, pwd, 1);
+    perror("bash: no homes for orphans");
+    
     //cd to home directory
-    cout << "hell" << endl;
     return ret;
 }
