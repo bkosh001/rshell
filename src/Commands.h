@@ -7,13 +7,13 @@ class Commands : public Shell {
     private:
         char str[100];
     public:
-        // Commands() : cmd(0) {}
+        Commands();
         Commands(char c[]);
         ~Commands() {};
         int execute();
-        // char** parses();
         int test(char* argv[], int size);
         int cd(char*argv[], int size);
+        void printcurPWD();
 };
 
 #endif

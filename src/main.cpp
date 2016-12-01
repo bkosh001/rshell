@@ -315,6 +315,12 @@ Shell* buildTree(vector<string> v, stack<Shell*> s) {
     return top;
 }
 
+// PRINT OUT CURRENT DIRECTORY
+void printDir() {
+    Commands c;
+    c.printcurPWD();
+    //FIXME: DOESN'T CHANGE WHEN DIRECTORY CHANGES
+}
 
 int main() {
     char host [500] = "";
@@ -325,7 +331,12 @@ int main() {
     int run = 0;
     while (run != 2) {
         string userInput = "";
-        cout << login << '@' << host << "$ ";
+        // OUTPUT HOST AND LOGIN
+        cout << login << '@' << host <<":~";
+        // OUTPUT CURRENT DIRECTORY
+        printDir();
+        cout << " $ ";
+        
         getline(cin, userInput);
         if (userInput.size() != 0 && userInput.at(0) != '#') {
             // cout << "Creating vector" << endl;

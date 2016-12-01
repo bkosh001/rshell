@@ -11,7 +11,13 @@
 #include <sys/stat.h>
 using namespace std;
 
-Commands::Commands(char c[]){
+Commands::Commands() : /*str(""),*/ oldPWD(0) {
+    curPWD = getenv("PWD");
+}
+
+Commands::Commands(char c[]) : oldPWD(0) {
+    curPWD = getenv("PWD");
+
     strcpy(this->str, c);
 }
 
@@ -54,14 +60,11 @@ int Commands::execute() {
     else if (child == 0) {
         // EXECUTE
         execvp(argv[0], argv);
-        // char t[] = "bash: ";
-        // char v[] = ": command not found";
-        // strcat(t,argv);
-        // strcat(t,v); FIX: include incorrect command in perror()
-        perror ("bash: command not found");
         // EXECVP SHOULD NOT CONTINUE HERE
-        // FIX: revise this part, what if a thing needs to happen
-        // i.e easdf || echo x
+        char err[50] = "bash: ";
+        strcat(err,argv[0]);
+        strcat(err, ": command not found");
+        perror (err);
         returnval = 0;
     }
     else if (child > 0) {
@@ -250,37 +253,87 @@ int Commands::test(char* argv[], int size){
 }
 
 int Commands::cd(char* argv[], int size){
-    int ret = 0;
-    char pwd[500] = "";
-    char err[500] = "bash: cd: ";
+    
     // CD TO <PATH> OR -
 
     if (argv[1]){
         // CD TO PREVIOUS WORKING DIR
         if (strcmp(argv[1], "-") == 0) {
-            chdir(argv[1]); //fix needed, this doesn't work
-            getenv(argv[1]);
-            setenv(argv[1], pwd, 1);
-            
+            char* o = getenv("PWD"); //saves a temp copy of pwd (new previous)
+            if (chdir("OLDPWD") < 0) { // go to oldpwd
+                perror("bash: cd: OLDPWD not set");
+                return 0; //chdir fails, no OLDPWD
+            }
+            getenv("OLDPWD"); //get the oldpwd
+            setenv("PWD","OLDPWD", 1); //save oldpwd to the current one
+            setenv("OLDPWD", o, 1); // save oldpwd
             return 1;
         }
         // CD TO HOME DIRECTORY
         
         // CD TO PATH
-        chdir(argv[1]);
+        // char* cur = getenv("PWD");
+
+        // setenv()
+        //FIX: UPDATE OLDPWD
+        setenv("OLDPWD", "PWD", 1); //save PWD to OLDPWD
+        int r = chdir(argv[1]);
+        if (r < 0) {
+            char err[500] = "bash: cd: ";
+            strcat(err,argv[1]);
+            perror(err);
+            return 0;
+        }
         getenv(argv[1]);
-        setenv(argv[1], pwd, 1);
-        strcat(err,argv[1]);
-        perror(err);
+        char* p = getenv("PWD");
+        char s[1] = {'/'};
+        // setenv(p, "PWD", 1);
+        strcat(p, s);
+        strcat(p, argv[1]);
+        if (strcmp(argv[1], "..") == 0) {
+            //remove /.. and directory right before that
+        int len = strlen(p);
+        
+            while (p[len - 1] != '/') {
+                p[len - 1] = '\0'; //FIX: what do if user does cd .. at home dir?
+                --len;
+            }
+            p[len - 1] = '\0';
+            while (p[len - 1] != '/') {
+                p[len - 1] = '\0'; //FIX: what do if user does cd .. at home dir?
+                --len;
+            }
+            
+        }
+        // FIX: REMOVE /.. AND PREC DIRECTORY
+        //maybe change /.. and stuff before into '\0'
+        setenv("PWD", p, 1);
+        // cout << "CURR:" << endl;
+        // printcurPWD();
+        
         return 1;
     }
     // JUST CD
-    char* h = getenv("HOME");
-    chdir(h);
-    getenv(h);
-    setenv(h, pwd, 1);
-    perror("bash: no homes for orphans");
+    // FIX: UPDATE OLDPWD
+    
+
+    setenv("OLDPWD", "PWD", 1); //overwrite OLDPWD with PWD(current PWD)
+    int r = chdir("HOME");
+    if (r < 0) {
+        perror("no homes for orphans");
+        return 0;
+    }
+    getenv("HOME");
+    setenv("PWD", "HOME", 1);
+    
     
     //cd to home directory
-    return ret;
+    return 0;
+}
+
+void Commands::printcurPWD() {
+    char* curPWD = getenv("PWD");
+    for (int i = 0; curPWD[i] != '\0'; ++i) {
+        cout << curPWD[i];
+    }
 }
