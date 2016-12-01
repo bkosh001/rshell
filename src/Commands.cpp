@@ -11,13 +11,9 @@
 #include <sys/stat.h>
 using namespace std;
 
-Commands::Commands() : /*str(""),*/ oldPWD(0) {
-    curPWD = getenv("PWD");
-}
+Commands::Commands() {}
 
-Commands::Commands(char c[]) : oldPWD(0) {
-    curPWD = getenv("PWD");
-
+Commands::Commands(char c[]) {
     strcpy(this->str, c);
 }
 
