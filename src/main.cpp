@@ -304,7 +304,7 @@ Shell* buildTree(vector<string> v, stack<Shell*> s) {
         }
         else { //item is not a connector
             char* str = new char[v.at(i).length() - 1];
-            strcpy(str, v.at(i).c_str()); //error here in valgrind
+            strcpy(str, v.at(i).c_str());
             // printf ("%s\n",str);
             Commands* t = new Commands(str);
             s.push(t);

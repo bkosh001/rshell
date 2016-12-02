@@ -265,40 +265,9 @@ int Commands::cd(char* argv[], int size){
             
             setenv("PWD", p, 1);
             return 1;
-        }
-        // CD TO PARENT DIR
-        // else if (strcmp(argv[1], "..") == 0) {
-        //     char* o = getenv("PWD");
-        //     if (chdir(argv[1]) < 0) { // go to oldpwd
-        //         perror("bash: cd: orphans have no parents");
-        //         return 0; //chdir fails, no OLDPWD
-        //     }
-        //     char* p = getenv("PWD");
-        //     //remove prev directory
-        //     int len = strlen(p);
-            
-        //     while (p[len - 1] != '/' && len > 0) {
-        //         p[len - 1] = '\0'; //FIX: what do if user does cd .. at home dir?
-        //         --len;
-        //     }
-        //     p[len - 1] = '\0'; //p is cstring of cur dir
-        //     // FIXME what do if user does ../dir or ../..
-        //     // FIXME OLDPWD NOT BEING UPDATED
-        //     // FIXME ...Assn2/#bin error but works when cd to Tests
-        //     // p[len - 1] = '\0'; // GET RID OF "/"
-        //     // getenv("OLDPWD"); //get the oldpwd
-        //     chdir(p);
-        //     setenv("PWD", p, 1); // SET CURRENT TO PARENT
-        //     setenv("OLDPWD", o, 1); // SET PREV TO OLD
-        //     return 1;
-        // }
-        // FIX: REMOVE /.. AND PREC DIRECTORY
-        // maybe change /.. and stuff before into '\0'
-        // setenv("PWD", p, 1);
-        // cout << "CURR:" << endl;
-        // printcurPWD();
         
         // CD TO PATH
+        }
         else {
             char* o = getenv("PWD");
             // cout << getenv("OLDPWD") << endl;
@@ -309,7 +278,7 @@ int Commands::cd(char* argv[], int size){
                 return 0;
             }
             //FIX ME: look into environmental variable "PATH"
-            char* curr = getenv("PATH");
+            char* curr = getcwd(argv[1], 500);
             setenv("OLDPWD", o, 1); //save PWD to OLDPWD;
             setenv("PWD", curr, 1);
             return 1;
