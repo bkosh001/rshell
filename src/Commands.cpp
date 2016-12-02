@@ -251,7 +251,7 @@ int Commands::test(char* argv[], int size){
 int Commands::cd(char* argv[], int size){
     
     // CD TO <PATH> OR -
-
+    // I REARANGED SOME STUFF TO MAKE IT LOOK EASIER
     if (argv[1]){
         // CD TO PREVIOUS WORKING DIR
         if (strcmp(argv[1], "-") == 0) {
@@ -261,69 +261,83 @@ int Commands::cd(char* argv[], int size){
                 return 0; //chdir fails, no OLDPWD
             }
             getenv("OLDPWD"); //get the oldpwd
-            setenv("PWD","OLDPWD", 1); //save oldpwd to the current one
-            setenv("OLDPWD", o, 1); // save oldpwd
+            // setenv("PWD","OLDPWD", 1); //save oldpwd to the current one
+            setenv("OLDPWD", o, 1); // save "new" oldpwd
             return 1;
         }
-        // CD TO HOME DIRECTORY
-        
-        // CD TO PATH
-        // char* cur = getenv("PWD");
-
-        // setenv()
-        //FIX: UPDATE OLDPWD
-        setenv("OLDPWD", "PWD", 1); //save PWD to OLDPWD
-        int r = chdir(argv[1]);
-        if (r < 0) {
-            char err[500] = "bash: cd: ";
-            strcat(err,argv[1]);
-            perror(err);
-            return 0;
-        }
-        getenv(argv[1]);
-        char* p = getenv("PWD");
-        char s[1] = {'/'};
-        // setenv(p, "PWD", 1);
-        strcat(p, s);
-        strcat(p, argv[1]);
-        if (strcmp(argv[1], "..") == 0) {
-            //remove /.. and directory right before that
-        int len = strlen(p);
-        
-            while (p[len - 1] != '/') {
-                p[len - 1] = '\0'; //FIX: what do if user does cd .. at home dir?
-                --len;
-            }
-            p[len - 1] = '\0';
-            while (p[len - 1] != '/') {
-                p[len - 1] = '\0'; //FIX: what do if user does cd .. at home dir?
-                --len;
-            }
+        // CD TO PARENT DIR
+        // else if (strcmp(argv[1], "..") == 0) {
+        //     char* o = getenv("PWD");
+        //     if (chdir(argv[1]) < 0) { // go to oldpwd
+        //         perror("bash: cd: orphans have no parents");
+        //         return 0; //chdir fails, no OLDPWD
+        //     }
+        //     char* p = getenv("PWD");
+        //     //remove prev directory
+        //     int len = strlen(p);
             
-        }
+        //     while (p[len - 1] != '/' && len > 0) {
+        //         p[len - 1] = '\0'; //FIX: what do if user does cd .. at home dir?
+        //         --len;
+        //     }
+        //     p[len - 1] = '\0'; //p is cstring of cur dir
+        //     // FIXME what do if user does ../dir or ../..
+        //     // FIXME OLDPWD NOT BEING UPDATED
+        //     // FIXME ...Assn2/#bin error but works when cd to Tests
+        //     // p[len - 1] = '\0'; // GET RID OF "/"
+        //     // getenv("OLDPWD"); //get the oldpwd
+        //     chdir(p);
+        //     setenv("PWD", p, 1); // SET CURRENT TO PARENT
+        //     setenv("OLDPWD", o, 1); // SET PREV TO OLD
+        //     return 1;
+        // }
         // FIX: REMOVE /.. AND PREC DIRECTORY
-        //maybe change /.. and stuff before into '\0'
-        setenv("PWD", p, 1);
+        // maybe change /.. and stuff before into '\0'
+        // setenv("PWD", p, 1);
         // cout << "CURR:" << endl;
         // printcurPWD();
         
-        return 1;
+        // CD TO PATH
+        else {
+            char* o = getenv("PWD");
+            setenv("OLDPWD", o, 1); //save PWD to OLDPWD;
+            // cout << getenv("OLDPWD") << endl;
+            int r = chdir(argv[1]);
+            
+            if (r < 0) { // PATH DOESNT EXIST
+                char err[500] = "bash: cd: ";
+                strcat(err,argv[1]);
+                perror(err);
+                return 0;
+            }
+            //FIX ME: look into environmental variable "PATH"
+            // getenv(argv[1]);
+            // char* p = getenv("PWD");
+            // char s[1] = {'/'};
+            // // setenv(p, "PWD", 1);
+            // strcat(p, s);
+            // strcat(p, argv[1]);
+            // setenv(p, "PATH", 1);
+            // char * p = 0;
+            // getenv("PATH");
+            char* p = getenv("PATH");
+            setenv("PWD", p, 1);
+            return 1;
+        }
     }
     // JUST CD
     // FIX: UPDATE OLDPWD
     
-
-    setenv("OLDPWD", "PWD", 1); //overwrite OLDPWD with PWD(current PWD)
-    int r = chdir("HOME");
+    char* p = getenv("PWD");
+    setenv("OLDPWD", p, 1); //overwrite OLDPWD with PWD(current PWD)
+    int r = chdir("HOME"); // FIXME DOESNT GO HOME
     if (r < 0) {
         perror("no homes for orphans");
         return 0;
     }
-    getenv("HOME");
-    setenv("PWD", "HOME", 1);
+    char * h = getenv("HOME");
+    setenv("PWD", h, 1);
     
-    
-    //cd to home directory
     return 0;
 }
 
