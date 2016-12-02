@@ -250,17 +250,17 @@ int Commands::test(char* argv[], int size){
 
 int Commands::cd(char* argv[], int size){
     // CD TO <PATH> OR -
-    // I REARANGED SOME STUFF TO MAKE IT LOOK EASIER
+
     if (argv[1]){
         // CD TO PREVIOUS WORKING DIR
         if (strcmp(argv[1], "-") == 0) {
-            if (chdir(getenv("OLDPWD")) < 0) { // go to oldpwd
+            char * p = getenv("OLDPWD");
+            cout << p << endl; //cd - outputs new path
+            if (chdir(p) < 0) { // go to oldpwd
                 perror("bash: cd: OLDPWD not set");
                 return 0; //chdir fails, no OLDPWD
             }
             char* o = getenv("PWD"); //saves a temp copy of pwd (new previous)
-            // setenv("PWD","OLDPWD", 1); //save oldpwd to the current one
-            char* p = getenv("OLDPWD"); //OLDPWD not updated to prev, copy it
             setenv("OLDPWD", o, 1); // save "new" oldpwd
             
             setenv("PWD", p, 1);
@@ -277,7 +277,7 @@ int Commands::cd(char* argv[], int size){
                 perror(err);
                 return 0;
             }
-            //FIX ME: look into environmental variable "PATH"
+
             char* curr = getcwd(argv[1], 500);
             setenv("OLDPWD", o, 1); //save PWD to OLDPWD;
             setenv("PWD", curr, 1);
@@ -285,7 +285,6 @@ int Commands::cd(char* argv[], int size){
         }
     }
     // JUST CD
-    // FIX: UPDATE OLDPWD
     char* p = getenv("PWD");
     setenv("OLDPWD", p, 1); //overwrite OLDPWD with PWD(current PWD)
 
